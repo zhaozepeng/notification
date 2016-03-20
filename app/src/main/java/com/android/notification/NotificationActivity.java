@@ -5,6 +5,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.NotificationCompat;
 import android.view.View;
@@ -34,12 +35,12 @@ public class NotificationActivity extends BaseActivity implements View.OnClickLi
     private NotificationCompat.Builder mBuilder;
     private Notification notification;
     private NotificationManager notificationManager;
-    private int currentNotificationId = 0;
 
     public static final int NOTIFY_ID1 = 255;
     public static final int NOTIFY_ID2 = 256;
     public static final int NOTIFY_ID3 = 257;
     public static final String NOTIFY_ACTION = "com.android.notification";
+    public static final String CLICK_ACTION = "com.android.click";
 
     private Timer timer;
     private TimerTask task;
@@ -61,8 +62,6 @@ public class NotificationActivity extends BaseActivity implements View.OnClickLi
         btn_show_normal.setOnClickListener(this);
         btn_show_dynamic.setOnClickListener(this);
         btn_big.setOnClickListener(this);
-
-        registerReceiver(NOTIFY_ACTION);
         btn_dismiss_dynamic = (Button) findViewById(R.id.btn_dismiss_dynamic);
         btn_dismiss_dynamic.setOnClickListener(this);
     }
@@ -70,13 +69,19 @@ public class NotificationActivity extends BaseActivity implements View.OnClickLi
     private void initData() {
         notificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        registerReceiver(NOTIFY_ACTION);
+        registerReceiver(CLICK_ACTION);
     }
 
     @Override
     protected void onReceive(Context context, Intent intent) {
         super.onReceive(context, intent);
-
-        T.getInstance().showShort("you click notification");
+        if (intent.getAction().equals(NOTIFY_ACTION)) {
+            T.getInstance().showShort("you click notification");
+        }else{
+            notificationManager.cancel(NOTIFY_ID3);
+        }
     }
 
     private String parseDate() {
@@ -93,32 +98,54 @@ public class NotificationActivity extends BaseActivity implements View.OnClickLi
                         .setContentTitle("this is notification title test")
                         .setContentText("this is notification text test")
                         .setNumber((int) (Math.random() *1000))
-            .setTicker("you got a new message")
-                    .setDefaults(Notification.DEFAULT_SOUND
-                            | Notification.DEFAULT_VIBRATE | Notification.DEFAULT_LIGHTS)
-                    .setAutoCancel(true)
-                    .setWhen(0);
-            Intent intent = new Intent(NOTIFY_ACTION);
-            PendingIntent pendingIntent = PendingIntent.getBroadcast(NotificationActivity.this,
-                    1000, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-            mBuilder.setContentIntent(pendingIntent);
-            notification = mBuilder.build();
-            currentNotificationId = NOTIFY_ID1;
-            notificationManager.notify(NOTIFY_ID1, notification);
+                .setTicker("you got a new message")
+                        .setDefaults(Notification.DEFAULT_SOUND
+                                | Notification.DEFAULT_VIBRATE | Notification.DEFAULT_LIGHTS)
+                        .setAutoCancel(true)
+                        .setWhen(0);
+                Intent intent = new Intent(NOTIFY_ACTION);
+                PendingIntent pendingIntent = PendingIntent.getBroadcast(NotificationActivity.this,
+                        1000, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                mBuilder.setContentIntent(pendingIntent);
+                notification = mBuilder.build();
+                notificationManager.notify(NOTIFY_ID1, notification);
             break;
             case R.id.btn_show_dynamic:
                 startTimeTask();
                 break;
             case R.id.btn_big:
+                mBuilder = new NotificationCompat.Builder(NotificationActivity.this);
+                mBuilder.setSmallIcon(R.mipmap.ic_launcher)
+                        .setContentTitle("this is notification title test")
+                        .setContentText("this is notification text test")
+                        .setNumber((int) (Math.random() *1000))
+                        .setTicker("you got a new message")
+                        .setDefaults(Notification.DEFAULT_SOUND
+                                | Notification.DEFAULT_VIBRATE | Notification.DEFAULT_LIGHTS)
+                        .setAutoCancel(true)
+                        .setWhen(0);
+                intent = new Intent(NOTIFY_ACTION);
+                pendingIntent = PendingIntent.getBroadcast(NotificationActivity.this,
+                        1000, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                mBuilder.setContentIntent(pendingIntent);
+                notification = mBuilder.build();
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                    RemoteViews view = new RemoteViews(getPackageName(), R.layout.layout_big_notification);
+                    view.setOnClickPendingIntent(R.id.btn_click_close,
+                            PendingIntent.getBroadcast(NotificationActivity.this, 1001,
+                                    new Intent(), PendingIntent.FLAG_UPDATE_CURRENT));
+                    notification.bigContentView = view;
+                }
+
+                notificationManager.notify(NOTIFY_ID3, notification);
                 break;
             case R.id.btn_dismiss_dynamic:
                 if (notification != null) {
-                    notificationManager.cancel(currentNotificationId);
-                    if (currentNotificationId == NOTIFY_ID2) {
-                        timer.cancel();
-                        timer = null;
-                        task = null;
-                    }
+                    notificationManager.cancel(NOTIFY_ID2);
+                    timer.cancel();
+                    timer = null;
+                    task = null;
                 }
                 break;
         }
@@ -155,7 +182,6 @@ public class NotificationActivity extends BaseActivity implements View.OnClickLi
                 .setOngoing(true)
                 .setContent(view);
         notification = mBuilder.build();
-        currentNotificationId = NOTIFY_ID2;
         notificationManager.notify(NOTIFY_ID2, notification);
     }
 }

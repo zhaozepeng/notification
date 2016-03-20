@@ -1,0 +1,6 @@
+http://www.2cto.com/kf/201408/327782.html
+http://blog.csdn.net/loongggdroid/article/details/17616509/
+http://www.cnblogs.com/over140/p/4249503.html
+http://www.itnose.net/detail/6169442.html
+http://www.codeceo.com/article/android-notification-4-types.html
+http://developer.android.com/intl/zh-cn/reference/android/app/WallpaperManager.html

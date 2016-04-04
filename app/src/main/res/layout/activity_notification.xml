@@ -28,4 +28,22 @@
         android:layout_height="wrap_content"
         android:text="显示Big View notification"/>
 
+    <Button
+        android:id="@+id/btn_Heads_up"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="显示heads up notification"/>
+
+    <Button
+        android:id="@+id/btn_start_activity_task"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="显示打开整个activity栈 notification"/>
+
+    <Button
+        android:id="@+id/btn_start_single_activity"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="显示打开单独activity notification"/>
+
 </LinearLayout>

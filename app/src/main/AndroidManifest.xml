@@ -2,18 +2,42 @@
     package="com.android.notification">
 
     <application
+        android:name="com.android.libcore_ui.application.BaseApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <activity android:name=".NotificationActivity">
+        <activity android:name=".NotificationActivity"
+            android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+
+        <activity android:name=".ChildActivity"
+            android:parentActivityName=".ParentTwoActivity"
+            android:label="child">
+            <meta-data android:name="android.support.PARENT_ACTIVITY"
+                android:value=".ParentTwoActivity"/>
+        </activity>
+
+        <activity android:name=".ParentTwoActivity"
+            android:parentActivityName=".ParentOneActivity"
+            android:label="parent two">
+            <meta-data android:name="android.support.PARENT_ACTIVITY"
+                android:value=".ParentOneActivity"/>
+        </activity>
+        <activity android:name=".ParentOneActivity"
+            android:label="parent one">
+
+        </activity>
+        <activity android:name=".SingleActivity"
+            android:launchMode="singleTask"
+            android:label="single"
+            android:taskAffinity=""/>
     </application>
 
 </manifest>
